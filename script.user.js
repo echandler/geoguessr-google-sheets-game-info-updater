@@ -88,6 +88,8 @@
     document.body.appendChild(mainBtn);
 
     const dialogBody = document.createElement("div");
+    
+    let codeFromRedirectURlString = `Google OAuth code from your redirect URL`;
 
     const dialog = document.createElement("dialog");
     dialog.id = "_dialog";
@@ -123,11 +125,11 @@
                 <h1 style="margin-bottom: 1rem">Section 2</h1>
                 <div style="display: flex; flex-direction: column; margin-bottom: 1rem;">
                     <a style="color: blue; text-decoration: underline; margin-bottom: 1rem;" target='_blank' href="https://console.cloud.google.com/auth/clients">Link to Oath Client page</a>
-                    <label><input id="oauth_client_id" style="width: 15rem; margin-right: 1rem;"></input>Google OAuth Client Id</label> 
+                    <label><input id="oauth_client_id" style="width: 15rem; margin-right: 1rem;"></input>Google OAuth Client ID</label> 
                     <label><input id="oauth_secret_code" style="width: 15rem; font-family: 'password'; margin-right: 1rem;"></input>Google OAuth Client Secret</label> 
                     <label><input id="oauth_redirect_url" style="width: 15rem; margin-right: 1rem;"></input>Google OAuth redirect URL</label> 
-                    <label><input id="oauth_code_from_url" style="width: 15rem; margin-right: 1rem;"></input>Google OAuth Code from your redirect URL</label> 
-                    <code style="font-size: 12px; margin: 1rem 0rem 1rem 0rem;">Example of a redirected URL with the "code", in red, that you need to copy for the "Google OAuth Code from URL" field:<br></br>
+                    <label><input id="oauth_code_from_url" style="width: 15rem; margin-right: 1rem;"></input>${codeFromRedirectURlString}</label> 
+                    <code style="font-size: 12px; margin: 1rem 0rem 1rem 0rem;">Example of a redirected URL with the "code", in red, that you need to copy for the "${codeFromRedirectURlString}" field:<br></br>
                         https://<span style="color: blue;">[YOUR REDIRECT URL]</span>/?state=state_parameter_passthrough_value&code=<span style="color: red;">4/0AVNBsJhQu43RVWoI-FKsAEArICW34RUhA8agFa8eu7Ity6q8gbs7cwxjcI91wtu3MVWk6B</span>&scope=https://www.googleapis.com/auth/spreadsheets
                     </code>
                     <code id="OAuth_url" style="font-size: 12px; overflow-wrap: break-word; padding: 5px;">-Press Save button for Authentication URL-</code> 
@@ -270,7 +272,7 @@
         let el = document.getElementById("OAuth_url");
         el.style.visibility = "hidden";
 
-        el.innerHTML = `</br>Copy this URL and paste it into a web browser, it will redirect to the redirect website from above and then you can copy the "code" and paste it into the "Google OAuth Code from your redirect URL" field: 
+        el.innerHTML = `</br>Copy this URL and paste it into a web browser, it will redirect to the redirect website from above and then you can copy the "code" and paste it into the "${codeFromRedirectURlString}" field: 
         <br>
         <br>
         ${customUrl}`;
@@ -280,7 +282,7 @@
         }, 100);
 
         if (!obj.clientId || !obj.redirectURL) {
-            _console.error("Missing OAuth redirect URL or OAuth Client Id for custom URL. Can be found in the OAuth client page.");
+            _console.error("Missing OAuth redirect URL or OAuth Client ID for custom URL. Can be found in the OAuth client page.");
             return;
         }
 
