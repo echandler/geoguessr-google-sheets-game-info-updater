@@ -122,12 +122,12 @@
             <section id="section2" class="section">
                 <h1 style="margin-bottom: 1rem">Section 2</h1>
                 <div style="display: flex; flex-direction: column; margin-bottom: 1rem;">
-                    <a style="color: blue; text-decoration: underline;" target='_blank' href="https://console.cloud.google.com/auth/clients">Link to Oath Client page</a>
+                    <a style="color: blue; text-decoration: underline; margin-bottom: 1rem;" target='_blank' href="https://console.cloud.google.com/auth/clients">Link to Oath Client page</a>
                     <label><input id="oauth_client_id" style="width: 15rem; margin-right: 1rem;"></input>Google OAuth Client Id</label> 
                     <label><input id="oauth_secret_code" style="width: 15rem; font-family: 'password'; margin-right: 1rem;"></input>Google OAuth Client Secret</label> 
-                    <label><input id="oauth_redirect_url" style="width: 15rem; margin-right: 1rem;"></input>Google OAuth Redirect URL</label> 
-                    <label><input id="oauth_code_from_url" style="width: 15rem; margin-right: 1rem;"></input>Google OAuth Code from URL</label> 
-                    <code style="font-size: 12px; margin-bottom: 1rem;">Example of a redirected URL with the "code", in red, that you need to copy for the "Google OAuth Code from URL" field:<br></br>
+                    <label><input id="oauth_redirect_url" style="width: 15rem; margin-right: 1rem;"></input>Google OAuth redirect URL</label> 
+                    <label><input id="oauth_code_from_url" style="width: 15rem; margin-right: 1rem;"></input>Google OAuth Code from your redirect URL</label> 
+                    <code style="font-size: 12px; margin: 1rem 0rem 1rem 0rem;">Example of a redirected URL with the "code", in red, that you need to copy for the "Google OAuth Code from URL" field:<br></br>
                         https://<span style="color: blue;">[YOUR REDIRECT URL]</span>/?state=state_parameter_passthrough_value&code=<span style="color: red;">4/0AVNBsJhQu43RVWoI-FKsAEArICW34RUhA8agFa8eu7Ity6q8gbs7cwxjcI91wtu3MVWk6B</span>&scope=https://www.googleapis.com/auth/spreadsheets
                     </code>
                     <code id="OAuth_url" style="font-size: 12px; overflow-wrap: break-word; padding: 5px;">-Press Save button for Authentication URL-</code> 
@@ -174,7 +174,7 @@
             </div>
 
     <template id="new_game_id_template" >
-        <div class="new_game_info" style="display: flex; flex-direction: row;margin-bottom: 1rem; padding: 1rem; outline: 1px solid grey;">
+        <div class="new_game_info" style="display: flex; flex-direction: row;margin-bottom: 1rem; padding: 1rem; outline: 1px solid grey; background: white;">
             <span class="delBtn" onclick="(function(_this){ _this.parentElement.remove();})(this)">X</span>
             <label style="margin-left: 1rem;">Game #ID: <input style="width: 15rem; margin-left: 1rem;" class="game_id"></input></label> 
             <label style="margin-left: 1rem;">Start Date: <input type="datetime-local" style="width: 15rem; margin-left: 1rem;" class="game_start_date"></input></label> 
@@ -270,7 +270,7 @@
         let el = document.getElementById("OAuth_url");
         el.style.visibility = "hidden";
 
-        el.innerHTML = `</br>Copy this url and paste it into a web browser, it will redirect to the redirect website from above and then you can copy the "code" and paste it into the "Google OAuth Code from URL" field: 
+        el.innerHTML = `</br>Copy this URL and paste it into a web browser, it will redirect to the redirect website from above and then you can copy the "code" and paste it into the "Google OAuth Code from your redirect URL" field: 
         <br>
         <br>
         ${customUrl}`;
