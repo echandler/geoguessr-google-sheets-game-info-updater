@@ -9,8 +9,7 @@
 // @namespace     google sheets
 // @grant         none
 // @unwrap
-// @downloadURL
-// @updateURL
+// @downloadURL   https://github.com/echandler/geoguessr-google-sheets-game-info-updater/raw/main/script.user.js
 // @tag           games
 // ==/UserScript==
 
@@ -18,12 +17,16 @@
     "use strict";
     document.head.insertAdjacentHTML(
         "beforeend",
-        `<style id="sheetsStyles">
+        `
+        <link rel="preload" href="https://jsbin-user-assets.s3.amazonaws.com/rafaelcastrocouto/password.ttf" as="font" type="font/ttf" crossorigin> 
+
+        <style id="sheetsStyles">
         @font-face {
             font-family: 'password';
             font-style: normal;
             font-weight: 400;
             src: url(https://jsbin-user-assets.s3.amazonaws.com/rafaelcastrocouto/password.ttf);
+            font-display: swap;
         }
         a {
             color: blue;
@@ -77,7 +80,11 @@
 
     const mainBtn = document.createElement("button");
     mainBtn.innerHTML = "Sheets";
-    mainBtn.style.cssText = `position: fixed; bottom: 1em; left: 1em; z-index: 9999; background-color: rgb(0 0 255 / 19%);`;
+    mainBtn.style.cssText = `position: fixed; bottom: 1em; left: 1em; z-index: 9999; background-color: rgb(0 0 255 / 19%); cursor: pointer;`;
+    mainBtn.addEventListener('click', () => {
+        dialog.showModal();
+    });
+
     document.body.appendChild(mainBtn);
 
     const dialogBody = document.createElement("div");
@@ -120,14 +127,17 @@
                     <label><input id="oauth_secret_code" style="width: 15rem; font-family: 'password'; margin-right: 1rem;"></input>Google OAuth Client Secret</label> 
                     <label><input id="oauth_redirect_url" style="width: 15rem; margin-right: 1rem;"></input>Google OAuth Redirect URL</label> 
                     <label><input id="oauth_code_from_url" style="width: 15rem; margin-right: 1rem;"></input>Google OAuth Code from URL</label> 
-                    <code style="font-size: 12px; margin-bottom: 1rem;">Example of a redirected URL with the "code" that you need to copy for the "Google OAuth Code from URL" field:<br></br>
-                        https://<span style="color: blue;">[YOUR REDIRECT URL]</span>/?state=state_parameter_passthrough_value&code=<span style="color: red;">4/0AVNBsJhQu43RVWoI-FKsAEArICW34RUhA8agFa8eu7Ity6q8gbs7cwxjcI91wtu3MVWk6B</span>&scope=https://www.googleapis.com/auth/drive
+                    <code style="font-size: 12px; margin-bottom: 1rem;">Example of a redirected URL with the "code", in red, that you need to copy for the "Google OAuth Code from URL" field:<br></br>
+                        https://<span style="color: blue;">[YOUR REDIRECT URL]</span>/?state=state_parameter_passthrough_value&code=<span style="color: red;">4/0AVNBsJhQu43RVWoI-FKsAEArICW34RUhA8agFa8eu7Ity6q8gbs7cwxjcI91wtu3MVWk6B</span>&scope=https://www.googleapis.com/auth/spreadsheets
                     </code>
                     <code id="OAuth_url" style="font-size: 12px; overflow-wrap: break-word; padding: 5px;">-Press Save button for Authentication URL-</code> 
                     </div>
 
                 <button style="align-self: flex-start;margin: 1rem;" class="abtn" id="save_work_info">Save</button>
                 <button style="align-self: flex-start;margin: 1rem;" class="abtn" id="get_initial_token">Get initial token</button>
+                <div style="margin-top: 1rem;">
+                    Video instructions: <a href="https://www.youtube.com/watch?v=EL37LYMZSZ0">https://www.youtube.com/watch?v=EL37LYMZSZ0</a>
+                </div>
             </section>
 
             <section id="section3" class="section">
@@ -147,12 +157,13 @@
                     <button style="align-self: flex-start;margin: 1rem;" class="abtn" id="clear_database">Delete database</button>
                 </div>
                 <div>
-                    <button style="align-self: flex-start;margin: 1rem;" class="abtn" id="fetch_update_spreadsheet_automatically">Updat spreadsheet with game info. AUTOMATICALLY</button><span id="autoUpdateMessage" style="color: red;"></span>
+                    <button style="align-self: flex-start;margin: 1rem;" class="abtn" id="fetch_update_spreadsheet_automatically">Update spreadsheet with game info. AUTOMATICALLY</button><span id="autoUpdateMessage" style="color: red;"></span>
                 </div>
                 <div>
                     <button style="align-self: flex-start;margin: 1rem;" class="abtn" id="fetch_update_spreadsheet">Update spreadsheet with game info. ONE TIME</button>
                 </div>
             </section>
+
         </main>
    </div> 
         <div style="height: 5%; display: flex;">
@@ -161,20 +172,21 @@
             <div style="margin: 0px auto;width: fit-content; position: absolute; top: 1rem; right: 2rem;">
                 <button style="padding: 1em;" class="abtn" onclick="document.querySelector('#_dialog').close()">Close and Play!</button>
             </div>
-    <div id="new_game_id_template" class="new_game_info" style="display: none; flex-direction: column;margin-bottom: 1rem; padding: 1rem; outline: 1px solid grey;">
+
+    <template id="new_game_id_template" >
+        <div class="new_game_info" style="display: flex; flex-direction: row;margin-bottom: 1rem; padding: 1rem; outline: 1px solid grey;">
             <span class="delBtn" onclick="(function(_this){ _this.parentElement.remove();})(this)">X</span>
-            <label><input style="width: 15rem; margin-right: 1rem;" class="game_id"></input>Game #ID</label> 
-            <label><input type="datetime-local" style="width: 15rem; margin-right: 1rem;" class="game_start_date"></input>Start Date</label> 
-            <label><input type="datetime-local" style="width: 15rem; margin-right: 1rem;" class="game_end_date"></input>End Date</label> 
-    </div>
+            <label style="margin-left: 1rem;">Game #ID: <input style="width: 15rem; margin-left: 1rem;" class="game_id"></input></label> 
+            <label style="margin-left: 1rem;">Start Date: <input type="datetime-local" style="width: 15rem; margin-left: 1rem;" class="game_start_date"></input></label> 
+            <label style="margin-left: 1rem;">End Date: <input type="datetime-local" style="width: 15rem; margin-left: 1rem;" class="game_end_date"></input></label> 
+        </div>
+    </template>
     `;
 
     dialogBody.appendChild(dialog);
-    document.body.appendChild(dialogBody);
-    setTimeout(() => {
-        dialog.showModal();
-    }, 1000);
 
+    document.body.appendChild(dialogBody);
+    
     dialog.addEventListener("click", async function (e) {
         console.log(e);
         if (e.target.classList.contains("nav-btn")) {
@@ -253,7 +265,7 @@
         let clientId = obj.clientId ? obj.clientId : "[YOUR OAUTH CLIENT-ID]";
         let siteUrl = obj.redirectURL ? obj.redirectURL : "[YOUR OAUTH REDIRECT URL]";
 
-        let customUrl = `https://accounts.google.com/o/oauth2/auth?client_id=<span style="color:green; font-size: 12px;">${clientId}</span>&redirect_uri=<span style="color:green; font-size: 12px;">${siteUrl}</span>&scope=https://www.googleapis.com/auth/drive&response_type=code&include_granted_scopes=true&access_type=offline&state=state_parameter_passthrough_value`;
+        let customUrl = `https://accounts.google.com/o/oauth2/auth?client_id=<span style="color:green; font-size: 12px;">${clientId}</span>&redirect_uri=<span style="color:green; font-size: 12px;">${siteUrl}</span>&scope=https://www.googleapis.com/auth/spreadsheets&response_type=code&include_granted_scopes=true&access_type=offline&state=state_parameter_passthrough_value`;
 
         let el = document.getElementById("OAuth_url");
         el.style.visibility = "hidden";
@@ -329,21 +341,19 @@
 
     function insertNewGame(gameObj) {
         const gamesDiv = document.getElementById("gamesIds");
-        const node = document.getElementById("new_game_id_template");
-        const cloned = node.cloneNode(true);
-        cloned.id = "";
-        cloned.style.display = "flex";
+        const template = document.querySelector('#new_game_id_template');
+        const cloned =document.importNode(template.content, true); 
+        const node = cloned.querySelector('.new_game_info');
 
         gamesDiv.appendChild(cloned);
 
         if (gameObj) {
-            const el = cloned;
-            el.querySelector(".game_id").value = gameObj.gameId;
-            el.querySelector(".game_start_date").value = gameObj.startDate;
-            el.querySelector(".game_end_date").value = gameObj.endDate;
+            node.querySelector(".game_id").value = gameObj.gameId;
+            node.querySelector(".game_start_date").value = gameObj.startDate;
+            node.querySelector(".game_end_date").value = gameObj.endDate;
         }
 
-        let inputs = cloned.querySelectorAll("input");
+        const inputs = cloned.querySelectorAll("input");
         inputs.forEach((inputEl) => {
             inputEl.addEventListener("change", function (e) {
                 cloned.style.outline = "2px solid green";
@@ -358,11 +368,9 @@
         const saveObj = {};
 
         newGameInfos.forEach((el) => {
-            if (el.id == "new_game_id_template") return;
-
-            let gameId = el.querySelector(".game_id").value;
-            let startDate = el.querySelector(".game_start_date").value;
-            let endDate = el.querySelector(".game_end_date").value;
+            const gameId = el.querySelector(".game_id").value;
+            const startDate = el.querySelector(".game_start_date").value;
+            const endDate = el.querySelector(".game_end_date").value;
 
             if (!gameId || !startDate || !endDate) {
                 el.style.outline = "2px solid red";
@@ -437,7 +445,7 @@
         updateInfo = JSON.parse(updateInfo);
 
         if (updateInfo.minutes < 1) {
-            alert("Update minuntes field has to be more that 1 minute to auto update.");
+            alert("Update minutes field has to be more that 1 minute to auto update.");
             return;
         }
 
@@ -585,29 +593,41 @@
 
         for (let rowNum = 0; rowNum < schema.length; ) {
             // Push rows to sheet in batches, not all at once.
-
+            
             let rows = [];
+            let num = 0;
 
             for (let m = 0; m < rowNum; m++) {
                 rows.push([]);
             }
-
+            
             if (schema[rowNum]) {
                 rows.push(schema[rowNum]);
+                num += 1;
             }
             if (schema[rowNum + 1]) {
                 rows.push(schema[rowNum + 1]);
+                num += 1;
             }
             if (schema[rowNum + 2]) {
                 rows.push(schema[rowNum + 2]);
+                num += 1;
             }
-
-            rowNum += 3;
+            
+            if (num === 1){
+                _console.log(`Pushing row ${rowNum + 1} to your sheet.`);
+            } else if (num === 2){
+                _console.log(`Pushing rows ${rowNum + 1}, and ${rowNum + 1 + 1} to your sheet.`);
+            } else if (num === 3){
+                _console.log(`Pushing rows ${rowNum + 1}, ${rowNum + 1 + 1}, and ${rowNum + 1 + 2} to your sheet.`);
+            }
 
             let ret = await pushRowsToSheet(rows);
             if (ret === false) {
                 break;
             }
+
+            rowNum += 3;
         }
 
         db.update(1, JSON.stringify(_db));
@@ -617,7 +637,6 @@
     window.pushDataToSheets = pushDataToSheets;
 
     async function pushRowsToSheet(_data) {
-        _console.log("Pushing rows to sheet.");
 
         let oathToken = localStorage["__oauthToken"];
 
@@ -667,8 +686,17 @@
                 return true;
             }
 
+            if (ret?.error?.code == 403){
+                if (ret?.error?.message && /Google Sheets API has not been used/.test(ret?.error?.message)){
+                    alert("Error accessing Google Sheet for some reason. Is the Google Sheets API enabled?\n\n See console for error message.");
+                    _console.error(`Error accessing Google sheet, has the Google Sheet API been enabled? Check here <a target='_blank' href="https://console.developers.google.com/apis/api/sheets.googleapis.com/overview">link</a>.`)
+                    console.log("Google Sheets Error: ", ret);
+                }
+                return false;
+            }
+
             alert("Error accessing Google Sheet for some reason.\n\n See console for error message.");
-            _console.error("Google Sheets Error:");
+            _console.error("Google Sheets Error:" + ret?.error?.code +" - "+ ret?.error?.message);
             console.log("Google Sheets Error: ", ret);
             return false;
         }
@@ -852,9 +880,18 @@
                 await clearSheet();
                 return true;
             }
+            
+            if (ret?.error?.code == 403){
+                if (ret?.error?.message && /Google Sheets API has not been used/.test(ret?.error?.message)){
+                    alert("Error accessing Google Sheet for some reason. Is the Google Sheets API enabled?\n\n See console for error message.");
+                    _console.error(`Error accessing Google sheet, has the Google Sheet API been enabled? Check here <a target='_blank' href="https://console.developers.google.com/apis/api/sheets.googleapis.com/overview">link</a>.`)
+                    console.log("Google Sheets Error: ", ret);
+                }
+                return false;
+            }
 
             alert("Error accessing Google Sheet for some reason.\n\n See console for error message.");
-            _console.error("Google Sheets Error:", ret);
+            _console.error("Google Sheets Error:" + ret?.error?.code +" - "+ ret?.error?.message);
             console.log("Google Sheets Error: ", ret);
             return false;
         }
